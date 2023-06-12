@@ -1,0 +1,33 @@
+version: "3.11"
+
+services:
+  db:
+    image: postgres:15
+    restart: always
+    container_name: db_app_postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+
+  app:
+    container_name: salary_check
+    build:
+      dockerfile: Dockerfile
+    env_file:
+      - salary_check/.env
+    volumes:
+      - ./backend:/salary_check/salary_check/backend
+    ports:
+      - 8000:8000
+    restart: always
+    command: ["/salary_check/docker/app.sh"]
+    depends_on:
+      - db
+
+volumes:
+  postgres_data:
